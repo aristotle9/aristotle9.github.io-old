@@ -6,7 +6,7 @@ block content
     article.article.intro
       header
         p.date
-          span= moment.utc(article.date).format('DD. MMMM YYYY')
+          span= moment.utc(article.date).format('YYYY-MM-DD')
         h2
           a(href=article.url)= article.title
       section.content
@@ -14,16 +14,16 @@ block content
           | !{ typogr(article.intro).typogrify() }
         if article.hasMore
           p.more
-            a(href=article.url) more
+            a(href=article.url) 阅读全文 »
 
 block prepend footer
   div.nav
     if prevPage
       a(href=prevPage.url) « Newer
     else
-      a(href='/archive.html') « Archives
+      a(href='/archive.html') « 归档
     if nextPage
-      a(href=nextPage.url) Next page »
+      a(href=nextPage.url) 下一页 »
 
 
 
