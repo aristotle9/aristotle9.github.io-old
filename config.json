@@ -3,7 +3,11 @@
     "url": "http://localhost:8080",
     "name": "mukio's blog",
     "owner": "Lan Fan",
-    "description": "Flash, Website"
+    "description": "Flash, Website",
+    "disqus": {
+      "url": "http://mukio.disqus.com",
+      "shortname": "mukio"
+    }
   },
   "plugins": [
     "./plugins/paginator.coffee"
