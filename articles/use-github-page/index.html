@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title>用Github做静态网站服务器 - Lan's Blog
+    </title>
+    <link rel="alternate" href="http://localhost:8080/feed.xml" type="application/rss+xml" title="Flash, Website">
+    <link rel="stylesheet" href="/css/main.css">
+    <!--link(rel='stylesheet', href='/css/typo.css')-->
+  </head>
+  <body class="article-detail">
+    <header class="header">
+      <div class="content-wrap">
+        <h1>用Github做静态网站服务器</h1>
+        <p class="author">作者 <span class="author"><a href="mailto:lanfan.1987@gmail.com">Lan Fan</a></span>
+        </p>
+      </div>
+    </header>
+    <div id="content">
+      <div class="content-wrap">
+        <article class="article">
+          <section class="content typo"><p>年初换了一台虚拟主机，但是没有把博客网站重新配置好。一拖又过了大半年时间。</p>
+<p>近来想起应该分享一些想法，于是想起来要重新搭建一个博客站点。中途想试试新的静态网站生成工具。在 <a href="https://www.staticgen.com/">StaticGen</a> 上看到一个列表，其中 <a href="http://hexo.io/">Hexo</a> 看起来是个比较流行的 JavaScript&nbsp;静态网站生成工具。下午就试用了一下。</p>
+<p><span class="more"></span></p>
+<p>之后发现 Hexo 一个挺不符合使用习惯的地方：<span class="caps">POST</span> 的 md 源文件与内使用的图片资源组织结构与之前 <a href="https://github.com/jnordberg/wintersmith">Wintersmith</a> 并不一样。最终折腾了几下又换回来了。然而不得不感叹 Hexo 模板的丰富是 Wintersmith 不能比的。所以之后自己又自行改了一下 css&nbsp;样式，让原来的网站看起来不是很丑。</p>
+<p>言归正传，选择 Github&nbsp;寄放博客网站的原因是方便。</p>
+<p><a href="https://help.github.com/categories/github-pages-basics/">Github Pages</a> 为每个用户，用户的每个项目都保留了一个静态页面站点。这些静态站点资源是通过 git 来部署的。个人站点需要在 github 上建立一个 <code>用户名.github.io</code> 的 repo，然后把相关文件 push 到 master 分支上。
+通过 <code>https://用户名.github.io/</code> 访问。项目的站点是在相应的项目库中建立一个 gh-pages 分支，然后将其中的源代码等文件清空，并把网站文件加进去，通过 <code>https://用户名.github.io/项目名</code> 来访问。</p>
+<p>个人站可以绑定个人域名，通过 <span class="caps">CNAME</span> 映射过去。同时要在根目录下放一个 CNAME&nbsp;文件，其中写上个人域名地址，以便验证和授权。</p>
+<p>所以，这跟以前用 ftp&nbsp;上传文件没有什么区别。</p>
+<p>现在，这个博客网站就是一个 Github Pages 站点，并且绑定了个人域名。 <a href="https://aristotle9.github.io/">https://aristotle9.github.io/</a> 和 <a href="http://blog.mukio.org/">http://blog.mukio.org/</a>&nbsp;都能访问。</p>
+</section>
+        </article>
+        <div id="disqus_thread"></div><script type="text/javascript">
+        var disqus_shortname = 'mukio';
+        (function() {
+           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+           dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+      </div>
+    </div>
+    <footer>
+      <div class="content-wrap">
+        <div class="nav"><a href="/">« 返回首页</a></div>
+        <!--section.about//!=contents['about.md'].html
+        -->
+        <section class="copy">
+          <p>&copy; 2015 Lan Fan &mdash; powered by&nbsp;<a href="https://github.com/jnordberg/wintersmith">Wintersmith</a>
+          </p>
+        </section>
+      </div>
+    </footer>
+  </body>
+</html>

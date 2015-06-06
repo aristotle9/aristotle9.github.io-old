@@ -5,9 +5,27 @@
     <atom:link href="http://localhost:8080/feed.xml" rel="self" type="application/rss+xml"></atom:link>
     <link>http://localhost:8080</link>
     <description>Flash, Website</description>
-    <pubDate>Mon, 11  Aug 2014 21:20:00 +0800</pubDate>
+    <pubDate>Sat, 06 Jun 2015 20:00:00 +0800</pubDate>
     <generator>Wintersmith - https://github.com/jnordberg/wintersmith</generator>
     <language>en</language>
+    <item>
+      <title>用Github做静态网站服务器</title>
+      <link>http://localhost:8080/articles/use-github-page/</link>
+      <pubDate>Sat, 06 Jun 2015 20:00:00 +0800</pubDate>
+      <guid isPermaLink="true">http://localhost:8080/articles/use-github-page/</guid>
+      <author></author>
+      <description>&lt;p&gt;年初换了一台虚拟主机，但是没有把博客网站重新配置好。一拖又过了大半年时间。&lt;/p&gt;
+&lt;p&gt;近来想起应该分享一些想法，于是想起来要重新搭建一个博客站点。中途想试试新的静态网站生成工具。在 &lt;a href=&quot;https://www.staticgen.com/&quot;&gt;StaticGen&lt;/a&gt; 上看到一个列表，其中 &lt;a href=&quot;http://hexo.io/&quot;&gt;Hexo&lt;/a&gt; 看起来是个比较流行的 JavaScript 静态网站生成工具。下午就试用了一下。&lt;/p&gt;
+&lt;p&gt;&lt;span class=&quot;more&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;之后发现 Hexo 一个挺不符合使用习惯的地方：POST 的 md 源文件与内使用的图片资源组织结构与之前 &lt;a href=&quot;https://github.com/jnordberg/wintersmith&quot;&gt;Wintersmith&lt;/a&gt; 并不一样。最终折腾了几下又换回来了。然而不得不感叹 Hexo 模板的丰富是 Wintersmith 不能比的。所以之后自己又自行改了一下 css 样式，让原来的网站看起来不是很丑。&lt;/p&gt;
+&lt;p&gt;言归正传，选择 Github 寄放博客网站的原因是方便。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://help.github.com/categories/github-pages-basics/&quot;&gt;Github Pages&lt;/a&gt; 为每个用户，用户的每个项目都保留了一个静态页面站点。这些静态站点资源是通过 git 来部署的。个人站点需要在 github 上建立一个 &lt;code&gt;用户名.github.io&lt;/code&gt; 的 repo，然后把相关文件 push 到 master 分支上。
+通过 &lt;code&gt;https://用户名.github.io/&lt;/code&gt; 访问。项目的站点是在相应的项目库中建立一个 gh-pages 分支，然后将其中的源代码等文件清空，并把网站文件加进去，通过 &lt;code&gt;https://用户名.github.io/项目名&lt;/code&gt; 来访问。&lt;/p&gt;
+&lt;p&gt;个人站可以绑定个人域名，通过 CNAME 映射过去。同时要在根目录下放一个 CNAME 文件，其中写上个人域名地址，以便验证和授权。&lt;/p&gt;
+&lt;p&gt;所以，这跟以前用 ftp 上传文件没有什么区别。&lt;/p&gt;
+&lt;p&gt;现在，这个博客网站就是一个 Github Pages 站点，并且绑定了个人域名。 &lt;a href=&quot;https://aristotle9.github.io/&quot;&gt;https://aristotle9.github.io/&lt;/a&gt; 和 &lt;a href=&quot;http://blog.mukio.org/&quot;&gt;http://blog.mukio.org/&lt;/a&gt; 都能访问。&lt;/p&gt;
+</description>
+    </item>
     <item>
       <title>舰娘之混淆代码分析</title>
       <link>http://localhost:8080/articles/remove-kancolle-obfus/</link>
