@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>mukio's blog</title>
+    <atom:link href="http://localhost:8080/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <link>http://localhost:8080</link>
+    <description>Flash, Website</description>
+    <pubDate>Mon, 11  Aug 2014 21:20:00 +0800</pubDate>
+    <generator>Wintersmith - https://github.com/jnordberg/wintersmith</generator>
+    <language>en</language>
+    <item>
+      <title>舰娘之混淆代码分析</title>
+      <link>http://localhost:8080/articles/remove-kancolle-obfus/</link>
+      <pubDate>Mon, 11  Aug 2014 21:20:00 +0800</pubDate>
+      <guid isPermaLink="true">http://localhost:8080/articles/remove-kancolle-obfus/</guid>
+      <author></author>
+      <description>&lt;p&gt;玩舰娘后，曾用 &lt;a href=&quot;http://clojure.org/&quot;&gt;Clojure&lt;/a&gt; 写过一个自动远征的程序 &lt;a href=&quot;https://github.com/aristotle9/kancolle-worker&quot;&gt;kancolle-worker&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;这个程序在 Clojure 的 REPL 中提供主要的舰娘 api 及基本的游戏逻辑模型，懂 Clojure 的人很容易写出一个自动远征程序。&lt;/p&gt;
+&lt;p&gt;后来舰娘的主要 api 添加了一个校验参数: api_port ，用于屏蔽第三方挂机程序。该参数的生成算法是混淆过的，不易阅读。如果要继续使用外挂程序，就必须疏理一下诸如下面这种代码，然后用其他语言实现。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;built_in&quot;&gt;RegExp&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;&quot;.&quot;&lt;/span&gt;)(&lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;built_in&quot;&gt;RegExp&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;&quot;...$&quot;&lt;/span&gt;)(~(~[][{}] &amp;lt;&amp;lt; ~[][{}])))
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;这是一段表示字符串 &lt;code&gt;&amp;quot;6&amp;quot;&lt;/code&gt; 的代码。通过观察上面的表达式，发现其中所有的项都是常量，那么表达式的结果也应该是个常量。进一步分析各个表达式。
+&lt;code&gt;[][{}]&lt;/code&gt; 为 &lt;code&gt;null&lt;/code&gt;，&lt;code&gt;~null&lt;/code&gt; 为 &lt;code&gt;-1&lt;/code&gt;，&lt;code&gt;-1 &amp;lt;&amp;lt; -1&lt;/code&gt; 为 &lt;code&gt;-2147483648&lt;/code&gt;，&lt;code&gt;~(-2147483648)&lt;/code&gt; 为 &lt;code&gt;2147483647&lt;/code&gt;，&lt;code&gt;(new RegExp(&amp;quot;...$&amp;quot;)(2147483647)&lt;/code&gt; 为 &lt;code&gt;&amp;quot;647&amp;quot;&lt;/code&gt; （转换成字符串后取末尾3个字符），&lt;code&gt;new RegExp(&amp;quot;.&amp;quot;)(&amp;quot;647&amp;quot;)&lt;/code&gt; 为 &lt;code&gt;&amp;quot;6&amp;quot;&lt;/code&gt; (取第一个字符)。&lt;/p&gt;
+&lt;p&gt;这种常量混淆形式比较新颖。&lt;/p&gt;
+&lt;p&gt;自从 Air SDK 从 Flex 编译工具中独立出来后，添加了许多功能。其中就有一个基本的常量折叠功能。常量折叠就是把代码中的常量表达式替换为表达式的最终结果，这样就省去了运行时的计算，对程序的运行效率有所提升。比如 &lt;code&gt;var a:int = 1 + 1;&lt;/code&gt; 编译后与 &lt;code&gt;var a:int = 2;&lt;/code&gt; 一样。我试过用 Air SDK 重新编译上面的表达式，发现没有被折叠。原因可能是上面的常量混淆利用了 as3语言的一些隐式的类型转换，以及空数组与空对象、正则表达式的的特性，超出了编译器的常量判定能力。&lt;/p&gt;
+&lt;p&gt;有个简便的方法可以计算表达式 &lt;code&gt;~(~[][{}] &amp;lt;&amp;lt; ~[][{}])&lt;/code&gt; 的结果。就是打开 Chrome 的 JS console, 运行上面的代码。正则表达式直接匹配则是 as3 语言的特性，JS 无法运行。&lt;code&gt;/./&amp;quot;234&amp;quot;&lt;/code&gt; 在 as3中 是合理的表达式，结果是 &lt;code&gt;&amp;quot;2&amp;quot;&lt;/code&gt;，在 JS 中是错误的式子。&lt;/p&gt;
+&lt;p&gt;为了快速得到混淆前的代码，我编写了这个 &lt;a href=&quot;http://localhost:8080/articles/remove-kancolle-obfus/demo.swf&quot;&gt;Flash&lt;/a&gt; 程序，它可以将舰娘的混淆代码简化。使用效果如图：&lt;img src=&quot;/articles/remove-kancolle-obfus/image1.png&quot; alt=&quot;常量折叠功能演示&quot;&gt;&lt;/p&gt;
+&lt;p&gt;图中的常量是部分上周舰娘的代码。&lt;/p&gt;
+&lt;p&gt;除此以外，舰娘的另一类代码混淆是将简单的运算符替换成函数调用。比如将 &lt;code&gt;x + y&lt;/code&gt; 替换成 &lt;code&gt;k.a(x, y)&lt;/code&gt;。这种方法与上面的混淆方法共同使用，产生的代码极难阅读。所以我写的 Flash 代码分析工具加入了表达式重新打印功能。效果如图: &lt;img src=&quot;/articles/remove-kancolle-obfus/image2.png&quot; alt=&quot;代码重新打印功能演示&quot;&gt;&lt;/p&gt;
+&lt;p&gt;图中的代码是部分上周舰娘的代码。它将常量折叠，并且将函数调用替换成 S-表达式，与 Clojure 的代码相差无几。&lt;/p&gt;
+&lt;p&gt;Flash 程序是用编译器生成工具所写，主要源码在附录。&lt;/p&gt;
+&lt;p&gt;它的主要目的在于分析舰娘中混淆的代码并转换为可读形式，所以并不是一个完整的语言。所涉及的运算符仅限于混淆代码使用的运行符。为了方便，正则表达式的调用写入了语法中。常量表达式与变量表达式在生成式中就分开了（ &lt;code&gt;Expr&lt;/code&gt; 与 &lt;code&gt;VExpr&lt;/code&gt; ）。最后，纠正了某 Flash 反编译工具导出的代码的一个运行符优先级问题。&lt;/p&gt;
+&lt;p&gt;有了这个工具，加密后的算法会更快分析出来，自动远征程序又可以愉快地运行了。同时说一句：外挂有风险，使用需要谨慎。&lt;/p&gt;
+&lt;p&gt;附1：工具使用方法&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;1. 从舰娘主程中分离出 Core.swf
+2. 用工具反编译出 api_port 类
+3. 使用我的工具分析其算法
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;附2：词法、语法源码&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-perl&quot;&gt;/&lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt;
+js tokens
+&lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt;/
+&lt;span class=&quot;variable&quot;&gt;%lex&lt;/span&gt;
+
+&lt;span class=&quot;variable&quot;&gt;%class&lt;/span&gt; JsLexer
+&lt;span class=&quot;variable&quot;&gt;%package&lt;/span&gt; org.lala.gen
+
+&lt;span class=&quot;variable&quot;&gt;%%&lt;/span&gt;
+[ \r\n\t]            /* skip whitespace &lt;span class=&quot;variable&quot;&gt;*/&lt;/span&gt;
+
+0x[&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;-&lt;span class=&quot;number&quot;&gt;9&lt;/span&gt;a-fA-F]+        &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = parseInt(&lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt;); &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&quot;hex&quot;&lt;/span&gt;;
+\d+        &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = parseInt(&lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt;); &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'int'&lt;/span&gt;;
+new     &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'new'&lt;/span&gt;
+RegExp  &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'RegExp'&lt;/span&gt;
+[a-zA-Z&lt;span class=&quot;number&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;variable&quot;&gt;$@&lt;/span&gt;][\w&lt;span class=&quot;number&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;variable&quot;&gt;$@&lt;/span&gt;]* &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'id'&lt;/span&gt;
+&lt;span class=&quot;string&quot;&gt;'[^'&lt;/span&gt;]&lt;span class=&quot;variable&quot;&gt;*'&lt;/span&gt;|&lt;span class=&quot;string&quot;&gt;&quot;[^&quot;&lt;/span&gt;]&lt;span class=&quot;variable&quot;&gt;*&quot;&lt;/span&gt; &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt;.&lt;span class=&quot;keyword&quot;&gt;substr&lt;/span&gt;(&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;, yyleng - &lt;span class=&quot;number&quot;&gt;2&lt;/span&gt;); &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'string'&lt;/span&gt;;
+
+&lt;span class=&quot;regexp&quot;&gt;/** flowing with div **/&lt;/span&gt;
+)        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt;
+]        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;']'&lt;/span&gt;
+}        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'}'&lt;/span&gt;
+~        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'~'&lt;/span&gt;
+
+false    &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = false; &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'boolean'&lt;/span&gt;
+true    &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = true; &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'boolean'&lt;/span&gt;
+null    &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = null; &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'null'&lt;/span&gt;
+
+/&lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt; flowing with regexp &lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt;/
+&amp;amp;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;amp;'&lt;/span&gt;
+\(        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt;
+*        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'*'&lt;/span&gt;
++        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'+'&lt;/span&gt;
+,        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;','&lt;/span&gt;
+-        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'-'&lt;/span&gt;
+\.        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'.'&lt;/span&gt;
+/        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'/'&lt;/span&gt;
+;        
+\&amp;lt;&amp;lt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;lt;&amp;lt;'&lt;/span&gt;
+=        
+&amp;gt;&amp;gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;gt;&amp;gt;'&lt;/span&gt;
+&amp;gt;&amp;gt;&amp;gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;gt;&amp;gt;&amp;gt;'&lt;/span&gt;
+\[        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'['&lt;/span&gt;
+{        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'{'&lt;/span&gt;
+|        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'|'&lt;/span&gt;
+
+/&lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt; div &lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt;/
+[&lt;span class=&quot;number&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;variable&quot;&gt;$a&lt;/span&gt;-zA-Z][&lt;span class=&quot;number&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;variable&quot;&gt;$a&lt;/span&gt;-zA-Z&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;-&lt;span class=&quot;number&quot;&gt;9&lt;/span&gt;]*    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'id'&lt;/span&gt;
+
+.        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'other'&lt;/span&gt;;
+
+&lt;span class=&quot;variable&quot;&gt;%%&lt;/span&gt;
+
+/lex
+
+&lt;span class=&quot;variable&quot;&gt;%class&lt;/span&gt; JsParser
+&lt;span class=&quot;variable&quot;&gt;%package&lt;/span&gt; org.lala.gen
+/* &lt;span class=&quot;variable&quot;&gt;%import&lt;/span&gt; org.lala.gen.JsLexer &lt;span class=&quot;variable&quot;&gt;*/&lt;/span&gt;
+&lt;span class=&quot;variable&quot;&gt;%lexer_name&lt;/span&gt; org.lala.gen.JsLexer 
+
+&lt;span class=&quot;variable&quot;&gt;%start&lt;/span&gt; VExpr
+
+&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;','&lt;/span&gt;
+&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'|'&lt;/span&gt;
+&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;amp;'&lt;/span&gt;
+&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;lt;&amp;lt;'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;gt;&amp;gt;'&lt;/span&gt;
+&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;gt;&amp;gt;&amp;gt;'&lt;/span&gt;
+&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'+'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'-'&lt;/span&gt;
+&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'*'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'/'&lt;/span&gt;
+&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'~'&lt;/span&gt;
+&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'new'&lt;/span&gt;
+&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'['&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;']'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'{'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'}'&lt;/span&gt;
+&lt;span class=&quot;variable&quot;&gt;%right&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt;
+
+&lt;span class=&quot;variable&quot;&gt;%%&lt;/span&gt;
+VExpr /* 变量表式 &lt;span class=&quot;variable&quot;&gt;*/&lt;/span&gt;
+    : Expr &lt;span class=&quot;variable&quot;&gt;%prec&lt;/span&gt; new
+    | id &lt;span class=&quot;string&quot;&gt;'.'&lt;/span&gt; id &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt; ArgList &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = [&lt;span class=&quot;string&quot;&gt;'mcall'&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$5&lt;/span&gt;]; }
+    | id &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt; ArgList &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = [&lt;span class=&quot;string&quot;&gt;'call'&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;]; }
+    | id
+    | &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt; VExpr &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$2&lt;/span&gt;; }
+    | VExpr &lt;span class=&quot;string&quot;&gt;'['&lt;/span&gt; VExpr &lt;span class=&quot;string&quot;&gt;']'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = [&lt;span class=&quot;string&quot;&gt;'index'&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;]; }
+    ;
+
+ArgList
+    : { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = []; }
+    | VExpr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = [&lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;]; }
+    | ArgList &lt;span class=&quot;string&quot;&gt;','&lt;/span&gt; VExpr { &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;.&lt;span class=&quot;keyword&quot;&gt;push&lt;/span&gt;(&lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;); &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;; }
+    ;
+
+Expr /* 常量表达式 &lt;span class=&quot;variable&quot;&gt;*/&lt;/span&gt;
+    : Number { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;; }
+    | &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt; Expr &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$2&lt;/span&gt;; }
+    | Expr &lt;span class=&quot;string&quot;&gt;'+'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; + &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
+    | Expr &lt;span class=&quot;string&quot;&gt;'|'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; | &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
+    | Expr &lt;span class=&quot;string&quot;&gt;'&amp;amp;'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; &amp;amp; &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
+    | Expr &lt;span class=&quot;string&quot;&gt;'-'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; - &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
+    | Expr &lt;span class=&quot;string&quot;&gt;'*'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; * &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
+    | Expr &lt;span class=&quot;string&quot;&gt;'/'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; / &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
+    | Expr &lt;span class=&quot;string&quot;&gt;'&amp;lt;&amp;lt;'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; &amp;lt;&amp;lt; &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
+    | Expr &lt;span class=&quot;string&quot;&gt;'&amp;gt;&amp;gt;'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; &amp;gt;&amp;gt; &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
+    | Expr &lt;span class=&quot;string&quot;&gt;'&amp;gt;&amp;gt;&amp;gt;'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; &amp;gt;&amp;gt;&amp;gt; &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
+    | &lt;span class=&quot;string&quot;&gt;'~'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = ~&lt;span class=&quot;variable&quot;&gt;$2&lt;/span&gt;; }
+    | &lt;span class=&quot;string&quot;&gt;'-'&lt;/span&gt; Expr &lt;span class=&quot;variable&quot;&gt;%prec&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'~'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = -&lt;span class=&quot;variable&quot;&gt;$2&lt;/span&gt; }
+    | Array
+    | Expr &lt;span class=&quot;string&quot;&gt;'['&lt;/span&gt; Expr &lt;span class=&quot;string&quot;&gt;']'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;[&lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;]; }
+    | &lt;span class=&quot;string&quot;&gt;'{'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'}'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = {}; }
+    | new &lt;span class=&quot;string&quot;&gt;'RegExp'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt; string &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = Number(String(&lt;span class=&quot;variable&quot;&gt;$6&lt;/span&gt;).match(new RegExp(&lt;span class=&quot;variable&quot;&gt;$4&lt;/span&gt;))[&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;]); }
+    ;
+
+Array
+    : &lt;span class=&quot;string&quot;&gt;'['&lt;/span&gt; ArrayList &lt;span class=&quot;string&quot;&gt;']'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$2&lt;/span&gt;; }
+    ;
+
+ArrayList
+    : { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = [] }
+    | Expr &lt;span class=&quot;string&quot;&gt;','&lt;/span&gt; ArrayList { &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;.&lt;span class=&quot;keyword&quot;&gt;unshift&lt;/span&gt;(&lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;); &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
+    | Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = [&lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;]; }
+    ;
+
+Number
+    : &lt;span class=&quot;keyword&quot;&gt;hex&lt;/span&gt;
+    | &lt;span class=&quot;keyword&quot;&gt;int&lt;/span&gt;
+    ;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    <item>
+      <title>新站开张</title>
+      <link>http://localhost:8080/articles/new-blog/</link>
+      <pubDate>Sat, 26 Jul 2014 20:20:00 +0800</pubDate>
+      <guid isPermaLink="true">http://localhost:8080/articles/new-blog/</guid>
+      <author></author>
+      <description>&lt;p&gt;自从百度空间改版后，便不再写过博客。过了几年，工作稳定下来了，新的博客站要开张了。&lt;/p&gt;
+&lt;p&gt;这次的网站搭建在自己的 vps 上，都是纯静态的页面。用的程序如页底所写：Wintersmith，是一个极简易的 nodejs 静态网站生成框架。&lt;/p&gt;
+&lt;p&gt;现在没有评论功能，以后我会添加的。博客内容将会是关于自己感兴趣的项目研究，开发的小程序等等。当然也会花点时间将百度空间的旧的文章迁移到这里。&lt;/p&gt;
+&lt;p&gt;决定使用 Wintersmith 之前，曾花了不少时间研究 Jekyll。它的功能比 Wintersmith 要丰富许多，然而因为 Jekyll 后端使用的是 Ruby 技术栈，并不很熟悉。考虑自己近期不会转用 Ruby，并且不想花太多时间在上面，最终决定使用 node.js 系的 Wintersmith。&lt;/p&gt;
+&lt;p&gt;css 样式用的是 Typo.css，感觉对中文排版效果会比较好。&lt;/p&gt;
+</description>
+    </item>
+  </channel>
+</rss>

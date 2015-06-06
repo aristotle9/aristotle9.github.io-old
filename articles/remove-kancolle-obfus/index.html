@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title>舰娘之混淆代码分析 - mukio's blog
+    </title>
+    <link rel="alternate" href="http://localhost:8080/feed.xml" type="application/rss+xml" title="Flash, Website">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/typo.css">
+  </head>
+  <body class="article-detail">
+    <header class="header">
+      <div class="content-wrap">
+        <h1>舰娘之混淆代码分析</h1>
+        <p class="author">作者 <span class="author"><a href="mailto:lanfan.1987@gmail.com">Lan Fan</a></span>
+        </p>
+      </div>
+    </header>
+    <div id="content">
+      <div class="content-wrap">
+        <article class="article">
+          <section class="content typo"><p>玩舰娘后，曾用 <a href="http://clojure.org/">Clojure</a> 写过一个自动远征的程序 <a href="https://github.com/aristotle9/kancolle-worker">kancolle-worker</a>。</p>
+<p>这个程序在 Clojure 的 <span class="caps">REPL</span> 中提供主要的舰娘 api 及基本的游戏逻辑模型，懂 Clojure&nbsp;的人很容易写出一个自动远征程序。</p>
+<p>后来舰娘的主要 api 添加了一个校验参数: api_port&nbsp;，用于屏蔽第三方挂机程序。该参数的生成算法是混淆过的，不易阅读。如果要继续使用外挂程序，就必须疏理一下诸如下面这种代码，然后用其他语言实现。</p>
+<pre><code class="lang-javascript"><span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="string">"."</span>)(<span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="string">"...$"</span>)(~(~[][{}] &lt;&lt; ~[][{}])))
+</code></pre>
+<p>这是一段表示字符串 <code>&quot;6&quot;</code> 的代码。通过观察上面的表达式，发现其中所有的项都是常量，那么表达式的结果也应该是个常量。进一步分析各个表达式。
+<code>[][{}]</code> 为 <code>null</code>，<code>~null</code> 为 <code>-1</code>，<code>-1 &lt;&lt; -1</code> 为 <code>-2147483648</code>，<code>~(-2147483648)</code> 为 <code>2147483647</code>，<code>(new RegExp(&quot;...$&quot;)(2147483647)</code> 为 <code>&quot;647&quot;</code> （转换成字符串后取末尾3个字符），<code>new RegExp(&quot;.&quot;)(&quot;647&quot;)</code> 为 <code>&quot;6&quot;</code> (取第一个字符)。</p>
+<p>这种常量混淆形式比较新颖。</p>
+<p>自从 Air <span class="caps">SDK</span> 从 Flex 编译工具中独立出来后，添加了许多功能。其中就有一个基本的常量折叠功能。常量折叠就是把代码中的常量表达式替换为表达式的最终结果，这样就省去了运行时的计算，对程序的运行效率有所提升。比如 <code>var a:int = 1 + 1;</code> 编译后与 <code>var a:int = 2;</code> 一样。我试过用 Air <span class="caps">SDK</span> 重新编译上面的表达式，发现没有被折叠。原因可能是上面的常量混淆利用了&nbsp;as3语言的一些隐式的类型转换，以及空数组与空对象、正则表达式的的特性，超出了编译器的常量判定能力。</p>
+<p>有个简便的方法可以计算表达式 <code>~(~[][{}] &lt;&lt; ~[][{}])</code> 的结果。就是打开 Chrome 的 <span class="caps">JS</span> console, 运行上面的代码。正则表达式直接匹配则是 as3 语言的特性，JS 无法运行。<code>/./&quot;234&quot;</code> 在 as3中 是合理的表达式，结果是 <code>&quot;2&quot;</code>，在 <span class="caps">JS</span>&nbsp;中是错误的式子。</p>
+<p>为了快速得到混淆前的代码，我编写了这个 <a href="/articles/remove-kancolle-obfus/demo.swf">Flash</a> 程序，它可以将舰娘的混淆代码简化。使用效果如图：<img src="/articles/remove-kancolle-obfus/image1.png" alt="常量折叠功能演示"></p>
+<p>图中的常量是部分上周舰娘的代码。</p>
+<p>除此以外，舰娘的另一类代码混淆是将简单的运算符替换成函数调用。比如将 <code>x + y</code> 替换成 <code>k.a(x, y)</code>。这种方法与上面的混淆方法共同使用，产生的代码极难阅读。所以我写的 Flash 代码分析工具加入了表达式重新打印功能。效果如图: <img src="/articles/remove-kancolle-obfus/image2.png" alt="代码重新打印功能演示"></p>
+<p>图中的代码是部分上周舰娘的代码。它将常量折叠，并且将函数调用替换成 S-表达式，与 Clojure&nbsp;的代码相差无几。</p>
+<p>Flash&nbsp;程序是用编译器生成工具所写，主要源码在附录。</p>
+<p>它的主要目的在于分析舰娘中混淆的代码并转换为可读形式，所以并不是一个完整的语言。所涉及的运算符仅限于混淆代码使用的运行符。为了方便，正则表达式的调用写入了语法中。常量表达式与变量表达式在生成式中就分开了（ <code>Expr</code> 与 <code>VExpr</code> ）。最后，纠正了某 Flash&nbsp;反编译工具导出的代码的一个运行符优先级问题。</p>
+<p>有了这个工具，加密后的算法会更快分析出来，自动远征程序又可以愉快地运行了。同时说一句：外挂有风险，使用需要谨慎。</p>
+<p>附1：工具使用方法</p>
+<pre><code>1. 从舰娘主程中分离出 Core.swf
+2. 用工具反编译出 api_port 类
+3. 使用我的工具分析其算法
+</code></pre><p>附2：词法、语法源码</p>
+<pre><code class="lang-perl">/<span class="variable">**</span>
+js tokens
+<span class="variable">**</span>/
+<span class="variable">%lex</span>
+
+<span class="variable">%class</span> JsLexer
+<span class="variable">%package</span> org.lala.gen
+
+<span class="variable">%%</span>
+[ \r\n\t]            /* skip whitespace <span class="variable">*/</span>
+
+0x[<span class="number">0</span>-<span class="number">9</span>a-fA-F]+        <span class="variable">$$</span> = parseInt(<span class="variable">$$</span>); <span class="keyword">return</span> <span class="string">"hex"</span>;
+\d+        <span class="variable">$$</span> = parseInt(<span class="variable">$$</span>); <span class="keyword">return</span> <span class="string">'int'</span>;
+new     <span class="keyword">return</span> <span class="string">'new'</span>
+RegExp  <span class="keyword">return</span> <span class="string">'RegExp'</span>
+[a-zA-Z<span class="number">_</span><span class="variable">$@</span>][\w<span class="number">_</span><span class="variable">$@</span>]* <span class="keyword">return</span> <span class="string">'id'</span>
+<span class="string">'[^'</span>]<span class="variable">*'</span>|<span class="string">"[^"</span>]<span class="variable">*"</span> <span class="variable">$$</span> = <span class="variable">$$</span>.<span class="keyword">substr</span>(<span class="number">1</span>, yyleng - <span class="number">2</span>); <span class="keyword">return</span> <span class="string">'string'</span>;
+
+<span class="regexp">/** flowing with div **/</span>
+)        <span class="keyword">return</span> <span class="string">')'</span>
+]        <span class="keyword">return</span> <span class="string">']'</span>
+}        <span class="keyword">return</span> <span class="string">'}'</span>
+~        <span class="keyword">return</span> <span class="string">'~'</span>
+
+false    <span class="variable">$$</span> = false; <span class="keyword">return</span> <span class="string">'boolean'</span>
+true    <span class="variable">$$</span> = true; <span class="keyword">return</span> <span class="string">'boolean'</span>
+null    <span class="variable">$$</span> = null; <span class="keyword">return</span> <span class="string">'null'</span>
+
+/<span class="variable">**</span> flowing with regexp <span class="variable">**</span>/
+<span class="amp">&amp;</span>        <span class="keyword">return</span> <span class="string">'&amp;'</span>
+\(        <span class="keyword">return</span> <span class="string">'('</span>
+*        <span class="keyword">return</span> <span class="string">'*'</span>
++        <span class="keyword">return</span> <span class="string">'+'</span>
+,        <span class="keyword">return</span> <span class="string">','</span>
+-        <span class="keyword">return</span> <span class="string">'-'</span>
+\.        <span class="keyword">return</span> <span class="string">'.'</span>
+/        <span class="keyword">return</span> <span class="string">'/'</span>
+;        
+\&lt;&lt;        <span class="keyword">return</span> <span class="string">'&lt;&lt;'</span>
+=        
+&gt;&gt;        <span class="keyword">return</span> <span class="string">'&gt;&gt;'</span>
+&gt;&gt;&gt;        <span class="keyword">return</span> <span class="string">'&gt;&gt;&gt;'</span>
+\[        <span class="keyword">return</span> <span class="string">'['</span>
+{        <span class="keyword">return</span> <span class="string">'{'</span>
+|        <span class="keyword">return</span> <span class="string">'|'</span>
+
+/<span class="variable">**</span> div <span class="variable">**</span>/
+[<span class="number">_</span><span class="variable">$a</span>-zA-Z][<span class="number">_</span><span class="variable">$a</span>-zA-Z<span class="number">0</span>-<span class="number">9</span>]*    <span class="keyword">return</span> <span class="string">'id'</span>
+
+.        <span class="keyword">return</span> <span class="string">'other'</span>;
+
+<span class="variable">%%</span>
+
+/lex
+
+<span class="variable">%class</span> JsParser
+<span class="variable">%package</span> org.lala.gen
+/* <span class="variable">%import</span> org.lala.gen.JsLexer <span class="variable">*/</span>
+<span class="variable">%lexer_name</span> org.lala.gen.JsLexer 
+
+<span class="variable">%start</span> VExpr
+
+<span class="variable">%left</span> <span class="string">','</span>
+<span class="variable">%left</span> <span class="string">'|'</span>
+<span class="variable">%left</span> <span class="string">'&amp;'</span>
+<span class="variable">%left</span> <span class="string">'&lt;&lt;'</span> <span class="string">'&gt;&gt;'</span>
+<span class="variable">%left</span> <span class="string">'&gt;&gt;&gt;'</span>
+<span class="variable">%left</span> <span class="string">'+'</span> <span class="string">'-'</span>
+<span class="variable">%left</span> <span class="string">'*'</span> <span class="string">'/'</span>
+<span class="variable">%left</span> <span class="string">'~'</span>
+<span class="variable">%left</span> <span class="string">'new'</span>
+<span class="variable">%left</span> <span class="string">'('</span> <span class="string">'['</span> <span class="string">']'</span> <span class="string">'{'</span> <span class="string">'}'</span>
+<span class="variable">%right</span> <span class="string">')'</span>
+
+<span class="variable">%%</span>
+VExpr /* 变量表式 <span class="variable">*/</span>
+    : Expr <span class="variable">%prec</span> new
+    | id <span class="string">'.'</span> id <span class="string">'('</span> ArgList <span class="string">')'</span> { <span class="variable">$$</span> = [<span class="string">'mcall'</span>, <span class="variable">$1</span>, <span class="variable">$3</span>, <span class="variable">$5</span>]; }
+    | id <span class="string">'('</span> ArgList <span class="string">')'</span> { <span class="variable">$$</span> = [<span class="string">'call'</span>, <span class="variable">$1</span>, <span class="variable">$3</span>]; }
+    | id
+    | <span class="string">'('</span> VExpr <span class="string">')'</span> { <span class="variable">$$</span> = <span class="variable">$2</span>; }
+    | VExpr <span class="string">'['</span> VExpr <span class="string">']'</span> { <span class="variable">$$</span> = [<span class="string">'index'</span>, <span class="variable">$1</span>, <span class="variable">$3</span>]; }
+    ;
+
+ArgList
+    : { <span class="variable">$$</span> = []; }
+    | VExpr { <span class="variable">$$</span> = [<span class="variable">$1</span>]; }
+    | ArgList <span class="string">','</span> VExpr { <span class="variable">$1</span>.<span class="keyword">push</span>(<span class="variable">$3</span>); <span class="variable">$$</span> = <span class="variable">$1</span>; }
+    ;
+
+Expr /* 常量表达式 <span class="variable">*/</span>
+    : Number { <span class="variable">$$</span> = <span class="variable">$1</span>; }
+    | <span class="string">'('</span> Expr <span class="string">')'</span> { <span class="variable">$$</span> = <span class="variable">$2</span>; }
+    | Expr <span class="string">'+'</span> Expr { <span class="variable">$$</span> = <span class="variable">$1</span> + <span class="variable">$3</span>; }
+    | Expr <span class="string">'|'</span> Expr { <span class="variable">$$</span> = <span class="variable">$1</span> | <span class="variable">$3</span>; }
+    | Expr <span class="string">'&amp;'</span> Expr { <span class="variable">$$</span> = <span class="variable">$1</span> <span class="amp">&amp;</span> <span class="variable">$3</span>; }
+    | Expr <span class="string">'-'</span> Expr { <span class="variable">$$</span> = <span class="variable">$1</span> - <span class="variable">$3</span>; }
+    | Expr <span class="string">'*'</span> Expr { <span class="variable">$$</span> = <span class="variable">$1</span> * <span class="variable">$3</span>; }
+    | Expr <span class="string">'/'</span> Expr { <span class="variable">$$</span> = <span class="variable">$1</span> / <span class="variable">$3</span>; }
+    | Expr <span class="string">'&lt;&lt;'</span> Expr { <span class="variable">$$</span> = <span class="variable">$1</span> &lt;&lt; <span class="variable">$3</span>; }
+    | Expr <span class="string">'&gt;&gt;'</span> Expr { <span class="variable">$$</span> = <span class="variable">$1</span> &gt;&gt; <span class="variable">$3</span>; }
+    | Expr <span class="string">'&gt;&gt;&gt;'</span> Expr { <span class="variable">$$</span> = <span class="variable">$1</span> &gt;&gt;&gt; <span class="variable">$3</span>; }
+    | <span class="string">'~'</span> Expr { <span class="variable">$$</span> = ~<span class="variable">$2</span>; }
+    | <span class="string">'-'</span> Expr <span class="variable">%prec</span> <span class="string">'~'</span> { <span class="variable">$$</span> = -<span class="variable">$2</span> }
+    | Array
+    | Expr <span class="string">'['</span> Expr <span class="string">']'</span> { <span class="variable">$$</span> = <span class="variable">$1</span>[<span class="variable">$3</span>]; }
+    | <span class="string">'{'</span> <span class="string">'}'</span> { <span class="variable">$$</span> = {}; }
+    | new <span class="string">'RegExp'</span> <span class="string">'('</span> string <span class="string">')'</span> Expr { <span class="variable">$$</span> = Number(String(<span class="variable">$6</span>).match(new RegExp(<span class="variable">$4</span>))[<span class="number">0</span>]); }
+    ;
+
+Array
+    : <span class="string">'['</span> ArrayList <span class="string">']'</span> { <span class="variable">$$</span> = <span class="variable">$2</span>; }
+    ;
+
+ArrayList
+    : { <span class="variable">$$</span> = [] }
+    | Expr <span class="string">','</span> ArrayList { <span class="variable">$3</span>.<span class="keyword">unshift</span>(<span class="variable">$1</span>); <span class="variable">$$</span> = <span class="variable">$3</span>; }
+    | Expr { <span class="variable">$$</span> = [<span class="variable">$1</span>]; }
+    ;
+
+Number
+    : <span class="keyword">hex</span>
+    | <span class="keyword">int</span>
+    ;
+</code></pre>
+</section>
+        </article>
+        <div id="disqus_thread"></div><script type="text/javascript">
+        var disqus_shortname = 'mukio';
+        (function() {
+           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+           dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+      </div>
+    </div>
+    <footer>
+      <div class="content-wrap">
+        <div class="nav"><a href="/">« 返回首页</a></div>
+        <!--section.about//!=contents['about.md'].html
+        -->
+        <section class="copy">
+          <p>&copy; 2015 Lan Fan &mdash; powered by&nbsp;<a href="https://github.com/jnordberg/wintersmith">Wintersmith</a>
+          </p>
+        </section>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title>新站开张 - mukio's blog
+    </title>
+    <link rel="alternate" href="http://localhost:8080/feed.xml" type="application/rss+xml" title="Flash, Website">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/typo.css">
+  </head>
+  <body class="article-detail">
+    <header class="header">
+      <div class="content-wrap">
+        <h1>新站开张</h1>
+        <p class="author">作者 <span class="author"><a href="mailto:lanfan.1987@gmail.com">Lan Fan</a></span>
+        </p>
+      </div>
+    </header>
+    <div id="content">
+      <div class="content-wrap">
+        <article class="article">
+          <section class="content typo"><p>自从百度空间改版后，便不再写过博客。过了几年，工作稳定下来了，新的博客站要开张了。</p>
+<p>这次的网站搭建在自己的 vps 上，都是纯静态的页面。用的程序如页底所写：Wintersmith，是一个极简易的 nodejs&nbsp;静态网站生成框架。</p>
+<p>现在没有评论功能，以后我会添加的。博客内容将会是关于自己感兴趣的项目研究，开发的小程序等等。当然也会花点时间将百度空间的旧的文章迁移到这里。</p>
+<p>决定使用 Wintersmith 之前，曾花了不少时间研究 Jekyll。它的功能比 Wintersmith 要丰富许多，然而因为 Jekyll 后端使用的是 Ruby 技术栈，并不很熟悉。考虑自己近期不会转用 Ruby，并且不想花太多时间在上面，最终决定使用 node.js 系的&nbsp;Wintersmith。</p>
+<p>css 样式用的是&nbsp;Typo.css，感觉对中文排版效果会比较好。</p>
+</section>
+        </article>
+        <div id="disqus_thread"></div><script type="text/javascript">
+        var disqus_shortname = 'mukio';
+        (function() {
+           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+           dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+      </div>
+    </div>
+    <footer>
+      <div class="content-wrap">
+        <div class="nav"><a href="/">« 返回首页</a></div>
+        <!--section.about//!=contents['about.md'].html
+        -->
+        <section class="copy">
+          <p>&copy; 2015 Lan Fan &mdash; powered by&nbsp;<a href="https://github.com/jnordberg/wintersmith">Wintersmith</a>
+          </p>
+        </section>
+      </div>
+    </footer>
+  </body>
+</html>
