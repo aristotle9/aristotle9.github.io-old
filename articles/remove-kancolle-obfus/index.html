@@ -24,6 +24,7 @@
           <section class="content typo"><p>玩舰娘后，曾用 <a href="http://clojure.org/">Clojure</a> 写过一个自动远征的程序 <a href="https://github.com/aristotle9/kancolle-worker">kancolle-worker</a>。</p>
 <p>这个程序在 Clojure 的 <span class="caps">REPL</span> 中提供主要的舰娘 api 及基本的游戏逻辑模型，懂 Clojure&nbsp;的人很容易写出一个自动远征程序。</p>
 <p>后来舰娘的主要 api 添加了一个校验参数: api_port&nbsp;，用于屏蔽第三方挂机程序。该参数的生成算法是混淆过的，不易阅读。如果要继续使用外挂程序，就必须疏理一下诸如下面这种代码，然后用其他语言实现。</p>
+<p><span class="more"></span></p>
 <pre><code class="lang-javascript"><span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="string">"."</span>)(<span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="string">"...$"</span>)(~(~[][{}] &lt;&lt; ~[][{}])))
 </code></pre>
 <p>这是一段表示字符串 <code>&quot;6&quot;</code> 的代码。通过观察上面的表达式，发现其中所有的项都是常量，那么表达式的结果也应该是个常量。进一步分析各个表达式。

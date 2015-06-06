@@ -17,6 +17,7 @@
       <description>&lt;p&gt;玩舰娘后，曾用 &lt;a href=&quot;http://clojure.org/&quot;&gt;Clojure&lt;/a&gt; 写过一个自动远征的程序 &lt;a href=&quot;https://github.com/aristotle9/kancolle-worker&quot;&gt;kancolle-worker&lt;/a&gt;。&lt;/p&gt;
 &lt;p&gt;这个程序在 Clojure 的 REPL 中提供主要的舰娘 api 及基本的游戏逻辑模型，懂 Clojure 的人很容易写出一个自动远征程序。&lt;/p&gt;
 &lt;p&gt;后来舰娘的主要 api 添加了一个校验参数: api_port ，用于屏蔽第三方挂机程序。该参数的生成算法是混淆过的，不易阅读。如果要继续使用外挂程序，就必须疏理一下诸如下面这种代码，然后用其他语言实现。&lt;/p&gt;
+&lt;p&gt;&lt;span class=&quot;more&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;lang-javascript&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;built_in&quot;&gt;RegExp&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;&quot;.&quot;&lt;/span&gt;)(&lt;span class=&quot;keyword&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;built_in&quot;&gt;RegExp&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;&quot;...$&quot;&lt;/span&gt;)(~(~[][{}] &amp;lt;&amp;lt; ~[][{}])))
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;这是一段表示字符串 &lt;code&gt;&amp;quot;6&amp;quot;&lt;/code&gt; 的代码。通过观察上面的表达式，发现其中所有的项都是常量，那么表达式的结果也应该是个常量。进一步分析各个表达式。
@@ -173,6 +174,7 @@ Number
       <author></author>
       <description>&lt;p&gt;自从百度空间改版后，便不再写过博客。过了几年，工作稳定下来了，新的博客站要开张了。&lt;/p&gt;
 &lt;p&gt;这次的网站搭建在自己的 vps 上，都是纯静态的页面。用的程序如页底所写：Wintersmith，是一个极简易的 nodejs 静态网站生成框架。&lt;/p&gt;
+&lt;p&gt;&lt;span class=&quot;more&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;现在没有评论功能，以后我会添加的。博客内容将会是关于自己感兴趣的项目研究，开发的小程序等等。当然也会花点时间将百度空间的旧的文章迁移到这里。&lt;/p&gt;
 &lt;p&gt;决定使用 Wintersmith 之前，曾花了不少时间研究 Jekyll。它的功能比 Wintersmith 要丰富许多，然而因为 Jekyll 后端使用的是 Ruby 技术栈，并不很熟悉。考虑自己近期不会转用 Ruby，并且不想花太多时间在上面，最终决定使用 node.js 系的 Wintersmith。&lt;/p&gt;
 &lt;p&gt;css 样式用的是 Typo.css，感觉对中文排版效果会比较好。&lt;/p&gt;
