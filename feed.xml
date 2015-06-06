@@ -32,10 +32,12 @@
 &lt;p&gt;它的主要目的在于分析舰娘中混淆的代码并转换为可读形式，所以并不是一个完整的语言。所涉及的运算符仅限于混淆代码使用的运行符。为了方便，正则表达式的调用写入了语法中。常量表达式与变量表达式在生成式中就分开了（ &lt;code&gt;Expr&lt;/code&gt; 与 &lt;code&gt;VExpr&lt;/code&gt; ）。最后，纠正了某 Flash 反编译工具导出的代码的一个运行符优先级问题。&lt;/p&gt;
 &lt;p&gt;有了这个工具，加密后的算法会更快分析出来，自动远征程序又可以愉快地运行了。同时说一句：外挂有风险，使用需要谨慎。&lt;/p&gt;
 &lt;p&gt;附1：工具使用方法&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;1. 从舰娘主程中分离出 Core.swf
-2. 用工具反编译出 api_port 类
-3. 使用我的工具分析其算法
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;附2：词法、语法源码&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;从舰娘主程中分离出 Core.swf&lt;/li&gt;
+&lt;li&gt;用工具反编译出 api_port 类&lt;/li&gt;
+&lt;li&gt;使用我的工具分析其算法&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;附2：词法、语法源码&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;lang-perl&quot;&gt;/&lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt;
 js tokens
 &lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt;/

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -8,7 +8,7 @@
     </title>
     <link rel="alternate" href="http://localhost:8080/feed.xml" type="application/rss+xml" title="Flash, Website">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/typo.css">
+    <!--link(rel='stylesheet', href='/css/typo.css')-->
   </head>
   <body>
     <header class="header">
@@ -44,10 +44,12 @@
 <p>它的主要目的在于分析舰娘中混淆的代码并转换为可读形式，所以并不是一个完整的语言。所涉及的运算符仅限于混淆代码使用的运行符。为了方便，正则表达式的调用写入了语法中。常量表达式与变量表达式在生成式中就分开了（ <code>Expr</code> 与 <code>VExpr</code> ）。最后，纠正了某 Flash&nbsp;反编译工具导出的代码的一个运行符优先级问题。</p>
 <p>有了这个工具，加密后的算法会更快分析出来，自动远征程序又可以愉快地运行了。同时说一句：外挂有风险，使用需要谨慎。</p>
 <p>附1：工具使用方法</p>
-<pre><code>1. 从舰娘主程中分离出 Core.swf
-2. 用工具反编译出 api_port 类
-3. 使用我的工具分析其算法
-</code></pre><p>附2：词法、语法源码</p>
+<ol>
+<li>从舰娘主程中分离出&nbsp;Core.swf</li>
+<li>用工具反编译出 api_port&nbsp;类</li>
+<li>使用我的工具分析其算法</li>
+</ol>
+<p>附2：词法、语法源码</p>
 <pre><code class="lang-perl">/<span class="variable">**</span>
 js tokens
 <span class="variable">**</span>/
