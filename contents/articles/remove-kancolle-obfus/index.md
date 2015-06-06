@@ -13,6 +13,8 @@ template: article.jade
 
 后来舰娘的主要 api 添加了一个校验参数: api_port ，用于屏蔽第三方挂机程序。该参数的生成算法是混淆过的，不易阅读。如果要继续使用外挂程序，就必须疏理一下诸如下面这种代码，然后用其他语言实现。
 
+<span class="more"></span>
+
 ```javascript
 new RegExp(".")(new RegExp("...$")(~(~[][{}] << ~[][{}])))
 ```
