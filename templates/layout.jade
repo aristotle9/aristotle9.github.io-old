@@ -1,7 +1,7 @@
 doctype html
 block vars
   - var bodyclass = null;
-html(lang='en')
+html
   head
     block head
       meta(charset='utf-8')
@@ -12,7 +12,7 @@ html(lang='en')
           = locals.name
       link(rel='alternate', href=locals.url+'/feed.xml', type='application/rss+xml', title=locals.description)
       link(rel='stylesheet', href='/css/main.css')
-      link(rel='stylesheet', href='/css/typo.css')
+      //link(rel='stylesheet', href='/css/typo.css')
   body(class=bodyclass)
     header.header
       div.content-wrap
