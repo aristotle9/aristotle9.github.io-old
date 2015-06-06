@@ -3,16 +3,24 @@ h1, h2, h3, h4, h5, h6, p, body, a, img, ul, ol, blockquote, pre {
   margin: 0; padding: 0; border: 0;
 }
 
+html {
+  font-family: "Open Sans", sans-serif;
+}
+
 body {
-  font-size: 12px;
-  line-height: 1.52;
+  font-size: 1rem;
+  line-height: 1.85em;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: subpixel-antialiased;
+  font-smoothing: subpixel-antialiased;
   background-color: #f8f8f8;
   text-rendering: optimizeLegibility;
 }
 
 .content-wrap {
-  width: 34em;
+  width: 48rem;
   margin: 0 auto;
+  font-family: 'Merriweather', serif;
 }
 
 body, a {
@@ -117,9 +125,9 @@ hr {
 
 body.article-detail > header h1 {
   font-size: 2.5em;
-  font-style: italic;
   font-weight: 400;
-  margin-bottom: -0.2em;
+  margin-bottom: 0.2em;
+  font-family: 'Open Sans', sans-serif;
 }
 
 body.article-detail > header {
@@ -214,7 +222,7 @@ footer .copy, footer .copy a {
 
 .article .content img {
   display: block;
-  width: 100%;
+  margin: 0.5em auto;
 }
 
 .more, .date {
@@ -293,7 +301,8 @@ footer .copy, footer .copy a {
 
 code {
   font-family: 'Anonymous Pro', monospace;
-  font-size: 0.85em;
+  font-size: 1em;
+  letter-spacing: 0.01em;
   color: #000;
 }
 
@@ -387,7 +396,6 @@ code.lang-markdown .bullet {
 
 @media (max-width: 690px) {
   .content-wrap {
-    width: auto;
     padding: 0 1em;
   }
   .header {
