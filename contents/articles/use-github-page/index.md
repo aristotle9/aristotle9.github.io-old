@@ -3,6 +3,7 @@ title: 用Github做静态网站服务器
 author: lanfan
 date: 2015-06-06 20:00
 template: article.jade
+tags: github, hexo
 ---
 
 年初换了一台虚拟主机，但是没有把博客网站重新配置好。一拖又过了大半年时间。

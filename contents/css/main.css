@@ -196,7 +196,9 @@ footer .copy, footer .copy a {
 }
 
 .article header h2 a {
+  font-style: normal;
   text-decoration: none;
+  color: #171717;
 }
 
 .article header .date {
@@ -218,6 +220,19 @@ footer .copy, footer .copy a {
   text-decoration: underline;
   font-weight: 700;
   padding-left: 0.3em;
+}
+
+.article.intro .content .more a{
+  color: #171717;
+}
+
+.article .content a {
+  color: #ff8000;
+  text-decoration: none;
+}
+
+.article .content a:hover {
+  text-decoration: underline;
 }
 
 .article .content img {
@@ -441,3 +456,25 @@ code.lang-markdown .bullet {
   }
 }
 
+/** tag style **/
+.article-tag-row .tag-label {
+  display: inline-block;
+}
+.article-tag-row ul {
+  display: inline-block;
+  margin: 0 1em;
+}
+.article-tag-row ul>li {
+  list-style: none;
+  display: inline-block;
+}
+.article-tag-row ul>li>a {
+  padding: 5px 0.5em;
+  background-color: #eee;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #ff8000;
+}
+.article-tag-row ul>li>a:hover {
+  text-decoration: underline;
+}
