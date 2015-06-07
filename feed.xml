@@ -57,43 +57,43 @@
 &lt;li&gt;使用我的工具分析其算法&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;附2：词法、语法源码&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;lang-perl&quot;&gt;/&lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt;
+&lt;pre&gt;&lt;code class=&quot;lang-perl&quot;&gt;/**
 js tokens
-&lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt;/
-&lt;span class=&quot;variable&quot;&gt;%lex&lt;/span&gt;
+**&lt;span class=&quot;regexp&quot;&gt;/
+%lex
 
-&lt;span class=&quot;variable&quot;&gt;%class&lt;/span&gt; JsLexer
-&lt;span class=&quot;variable&quot;&gt;%package&lt;/span&gt; org.lala.gen
+%class JsLexer
+%package org.lala.gen
 
-&lt;span class=&quot;variable&quot;&gt;%%&lt;/span&gt;
-[ \r\n\t]            /* skip whitespace &lt;span class=&quot;variable&quot;&gt;*/&lt;/span&gt;
+%%
+[ \r\n\t]            /&lt;/span&gt;* skip whitespace *&lt;span class=&quot;regexp&quot;&gt;/
 
-0x[&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;-&lt;span class=&quot;number&quot;&gt;9&lt;/span&gt;a-fA-F]+        &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = parseInt(&lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt;); &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&quot;hex&quot;&lt;/span&gt;;
-\d+        &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = parseInt(&lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt;); &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'int'&lt;/span&gt;;
-new     &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'new'&lt;/span&gt;
-RegExp  &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'RegExp'&lt;/span&gt;
-[a-zA-Z&lt;span class=&quot;number&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;variable&quot;&gt;$@&lt;/span&gt;][\w&lt;span class=&quot;number&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;variable&quot;&gt;$@&lt;/span&gt;]* &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'id'&lt;/span&gt;
-&lt;span class=&quot;string&quot;&gt;'[^'&lt;/span&gt;]&lt;span class=&quot;variable&quot;&gt;*'&lt;/span&gt;|&lt;span class=&quot;string&quot;&gt;&quot;[^&quot;&lt;/span&gt;]&lt;span class=&quot;variable&quot;&gt;*&quot;&lt;/span&gt; &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt;.&lt;span class=&quot;keyword&quot;&gt;substr&lt;/span&gt;(&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;, yyleng - &lt;span class=&quot;number&quot;&gt;2&lt;/span&gt;); &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'string'&lt;/span&gt;;
+0x[0-9a-fA-F]+        $$ = parseInt($$); return &quot;hex&quot;;
+\d+        $$ = parseInt($$); return 'int';
+new     return 'new'
+RegExp  return 'RegExp'
+[a-zA-Z_$@][\w_$@]* return 'id'
+'[^']*'|&quot;[^&quot;]*&quot; $$ = $$.substr(1, yyleng - 2); return 'string';
 
-&lt;span class=&quot;regexp&quot;&gt;/** flowing with div **/&lt;/span&gt;
-)        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt;
-]        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;']'&lt;/span&gt;
-}        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'}'&lt;/span&gt;
-~        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'~'&lt;/span&gt;
+/&lt;/span&gt;** flowing with div **&lt;span class=&quot;regexp&quot;&gt;/
+)        return ')'
+]        return ']'
+}        return '}'
+~        return '~'
 
-false    &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = false; &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'boolean'&lt;/span&gt;
-true    &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = true; &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'boolean'&lt;/span&gt;
-null    &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = null; &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'null'&lt;/span&gt;
+false    $$ = false; return 'boolean'
+true    $$ = true; return 'boolean'
+null    $$ = null; return 'null'
 
-/&lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt; flowing with regexp &lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt;/
-&amp;amp;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;amp;'&lt;/span&gt;
-\(        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt;
-*        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'*'&lt;/span&gt;
-+        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'+'&lt;/span&gt;
-,        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;','&lt;/span&gt;
--        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'-'&lt;/span&gt;
-\.        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'.'&lt;/span&gt;
-/        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'/'&lt;/span&gt;
+/&lt;/span&gt;** flowing with regexp **&lt;span class=&quot;regexp&quot;&gt;/
+&amp;amp;        return '&amp;amp;'
+\(        return '('
+*        return '*'
++        return '+'
+,        return ','
+-        return '-'
+\.        return '.'
+/&lt;/span&gt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'/'&lt;/span&gt;
 ;        
 \&amp;lt;&amp;lt;        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;lt;&amp;lt;'&lt;/span&gt;
 =        
@@ -103,84 +103,84 @@ null    &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = null; &lt;span 
 {        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'{'&lt;/span&gt;
 |        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'|'&lt;/span&gt;
 
-/&lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt; div &lt;span class=&quot;variable&quot;&gt;**&lt;/span&gt;/
-[&lt;span class=&quot;number&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;variable&quot;&gt;$a&lt;/span&gt;-zA-Z][&lt;span class=&quot;number&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;variable&quot;&gt;$a&lt;/span&gt;-zA-Z&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;-&lt;span class=&quot;number&quot;&gt;9&lt;/span&gt;]*    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'id'&lt;/span&gt;
+/** div **&lt;span class=&quot;regexp&quot;&gt;/
+[_$a-zA-Z][_$a-zA-Z0-9]*    return 'id'
 
-.        &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'other'&lt;/span&gt;;
+.        return 'other';
 
-&lt;span class=&quot;variable&quot;&gt;%%&lt;/span&gt;
+%%
 
-/lex
+/lex&lt;/span&gt;
 
 &lt;span class=&quot;variable&quot;&gt;%class&lt;/span&gt; JsParser
 &lt;span class=&quot;variable&quot;&gt;%package&lt;/span&gt; org.lala.gen
-/* &lt;span class=&quot;variable&quot;&gt;%import&lt;/span&gt; org.lala.gen.JsLexer &lt;span class=&quot;variable&quot;&gt;*/&lt;/span&gt;
-&lt;span class=&quot;variable&quot;&gt;%lexer_name&lt;/span&gt; org.lala.gen.JsLexer 
+/* &lt;span class=&quot;variable&quot;&gt;%import&lt;/span&gt; org.lala.gen.JsLexer *&lt;span class=&quot;regexp&quot;&gt;/
+%lexer_name org.lala.gen.JsLexer 
 
-&lt;span class=&quot;variable&quot;&gt;%start&lt;/span&gt; VExpr
+%start VExpr
 
-&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;','&lt;/span&gt;
-&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'|'&lt;/span&gt;
-&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;amp;'&lt;/span&gt;
-&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;lt;&amp;lt;'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;gt;&amp;gt;'&lt;/span&gt;
-&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'&amp;gt;&amp;gt;&amp;gt;'&lt;/span&gt;
-&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'+'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'-'&lt;/span&gt;
-&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'*'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'/'&lt;/span&gt;
-&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'~'&lt;/span&gt;
-&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'new'&lt;/span&gt;
-&lt;span class=&quot;variable&quot;&gt;%left&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'['&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;']'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'{'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'}'&lt;/span&gt;
-&lt;span class=&quot;variable&quot;&gt;%right&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt;
+%left ','
+%left '|'
+%left '&amp;amp;'
+%left '&amp;lt;&amp;lt;' '&amp;gt;&amp;gt;'
+%left '&amp;gt;&amp;gt;&amp;gt;'
+%left '+' '-'
+%left '*' '/&lt;/span&gt;&lt;span class=&quot;string&quot;&gt;'
+%left '&lt;/span&gt;~&lt;span class=&quot;string&quot;&gt;'
+%left '&lt;/span&gt;new&lt;span class=&quot;string&quot;&gt;'
+%left '&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;' '&lt;/span&gt;[&lt;span class=&quot;string&quot;&gt;' '&lt;/span&gt;]&lt;span class=&quot;string&quot;&gt;' '&lt;/span&gt;{&lt;span class=&quot;string&quot;&gt;' '&lt;/span&gt;}&lt;span class=&quot;string&quot;&gt;'
+%right '&lt;/span&gt;)&lt;span class=&quot;string&quot;&gt;'
 
-&lt;span class=&quot;variable&quot;&gt;%%&lt;/span&gt;
-VExpr /* 变量表式 &lt;span class=&quot;variable&quot;&gt;*/&lt;/span&gt;
-    : Expr &lt;span class=&quot;variable&quot;&gt;%prec&lt;/span&gt; new
-    | id &lt;span class=&quot;string&quot;&gt;'.'&lt;/span&gt; id &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt; ArgList &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = [&lt;span class=&quot;string&quot;&gt;'mcall'&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$5&lt;/span&gt;]; }
-    | id &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt; ArgList &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = [&lt;span class=&quot;string&quot;&gt;'call'&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;]; }
+%%
+VExpr /* 变量表式 */
+    : Expr %prec new
+    | id '&lt;/span&gt;.&lt;span class=&quot;string&quot;&gt;' id '&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;' ArgList '&lt;/span&gt;)&lt;span class=&quot;string&quot;&gt;' { $$ = ['&lt;/span&gt;mcall&lt;span class=&quot;string&quot;&gt;', $1, $3, $5]; }
+    | id '&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;' ArgList '&lt;/span&gt;)&lt;span class=&quot;string&quot;&gt;' { $$ = ['&lt;/span&gt;call&lt;span class=&quot;string&quot;&gt;', $1, $3]; }
     | id
-    | &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt; VExpr &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$2&lt;/span&gt;; }
-    | VExpr &lt;span class=&quot;string&quot;&gt;'['&lt;/span&gt; VExpr &lt;span class=&quot;string&quot;&gt;']'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = [&lt;span class=&quot;string&quot;&gt;'index'&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;, &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;]; }
+    | '&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;' VExpr '&lt;/span&gt;)&lt;span class=&quot;string&quot;&gt;' { $$ = $2; }
+    | VExpr '&lt;/span&gt;[&lt;span class=&quot;string&quot;&gt;' VExpr '&lt;/span&gt;]&lt;span class=&quot;string&quot;&gt;' { $$ = ['&lt;/span&gt;&lt;span class=&quot;keyword&quot;&gt;index&lt;/span&gt;&lt;span class=&quot;string&quot;&gt;', $1, $3]; }
     ;
 
 ArgList
-    : { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = []; }
-    | VExpr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = [&lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;]; }
-    | ArgList &lt;span class=&quot;string&quot;&gt;','&lt;/span&gt; VExpr { &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;.&lt;span class=&quot;keyword&quot;&gt;push&lt;/span&gt;(&lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;); &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;; }
+    : { $$ = []; }
+    | VExpr { $$ = [$1]; }
+    | ArgList '&lt;/span&gt;,&lt;span class=&quot;string&quot;&gt;' VExpr { $1.push($3); $$ = $1; }
     ;
 
-Expr /* 常量表达式 &lt;span class=&quot;variable&quot;&gt;*/&lt;/span&gt;
-    : Number { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;; }
-    | &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt; Expr &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$2&lt;/span&gt;; }
-    | Expr &lt;span class=&quot;string&quot;&gt;'+'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; + &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
-    | Expr &lt;span class=&quot;string&quot;&gt;'|'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; | &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
-    | Expr &lt;span class=&quot;string&quot;&gt;'&amp;amp;'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; &amp;amp; &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
-    | Expr &lt;span class=&quot;string&quot;&gt;'-'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; - &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
-    | Expr &lt;span class=&quot;string&quot;&gt;'*'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; * &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
-    | Expr &lt;span class=&quot;string&quot;&gt;'/'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; / &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
-    | Expr &lt;span class=&quot;string&quot;&gt;'&amp;lt;&amp;lt;'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; &amp;lt;&amp;lt; &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
-    | Expr &lt;span class=&quot;string&quot;&gt;'&amp;gt;&amp;gt;'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; &amp;gt;&amp;gt; &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
-    | Expr &lt;span class=&quot;string&quot;&gt;'&amp;gt;&amp;gt;&amp;gt;'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt; &amp;gt;&amp;gt;&amp;gt; &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
-    | &lt;span class=&quot;string&quot;&gt;'~'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = ~&lt;span class=&quot;variable&quot;&gt;$2&lt;/span&gt;; }
-    | &lt;span class=&quot;string&quot;&gt;'-'&lt;/span&gt; Expr &lt;span class=&quot;variable&quot;&gt;%prec&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'~'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = -&lt;span class=&quot;variable&quot;&gt;$2&lt;/span&gt; }
+Expr /* 常量表达式 */
+    : Number { $$ = $1; }
+    | '&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;' Expr '&lt;/span&gt;)&lt;span class=&quot;string&quot;&gt;' { $$ = $2; }
+    | Expr '&lt;/span&gt;+&lt;span class=&quot;string&quot;&gt;' Expr { $$ = $1 + $3; }
+    | Expr '&lt;/span&gt;|&lt;span class=&quot;string&quot;&gt;' Expr { $$ = $1 | $3; }
+    | Expr '&lt;/span&gt;&amp;amp;&lt;span class=&quot;string&quot;&gt;' Expr { $$ = $1 &amp;amp; $3; }
+    | Expr '&lt;/span&gt;-&lt;span class=&quot;string&quot;&gt;' Expr { $$ = $1 - $3; }
+    | Expr '&lt;/span&gt;*&lt;span class=&quot;string&quot;&gt;' Expr { $$ = $1 * $3; }
+    | Expr '&lt;/span&gt;/&lt;span class=&quot;string&quot;&gt;' Expr { $$ = $1 / $3; }
+    | Expr '&lt;/span&gt;&amp;lt;&amp;lt;&lt;span class=&quot;string&quot;&gt;' Expr { $$ = $1 &amp;lt;&amp;lt; $3; }
+    | Expr '&lt;/span&gt;&amp;gt;&amp;gt;&lt;span class=&quot;string&quot;&gt;' Expr { $$ = $1 &amp;gt;&amp;gt; $3; }
+    | Expr '&lt;/span&gt;&amp;gt;&amp;gt;&amp;gt;&lt;span class=&quot;string&quot;&gt;' Expr { $$ = $1 &amp;gt;&amp;gt;&amp;gt; $3; }
+    | '&lt;/span&gt;~&lt;span class=&quot;string&quot;&gt;' Expr { $$ = ~$2; }
+    | '&lt;/span&gt;-&lt;span class=&quot;string&quot;&gt;' Expr %prec '&lt;/span&gt;~&lt;span class=&quot;string&quot;&gt;' { $$ = -$2 }
     | Array
-    | Expr &lt;span class=&quot;string&quot;&gt;'['&lt;/span&gt; Expr &lt;span class=&quot;string&quot;&gt;']'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;[&lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;]; }
-    | &lt;span class=&quot;string&quot;&gt;'{'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'}'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = {}; }
-    | new &lt;span class=&quot;string&quot;&gt;'RegExp'&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;'('&lt;/span&gt; string &lt;span class=&quot;string&quot;&gt;')'&lt;/span&gt; Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = Number(String(&lt;span class=&quot;variable&quot;&gt;$6&lt;/span&gt;).match(new RegExp(&lt;span class=&quot;variable&quot;&gt;$4&lt;/span&gt;))[&lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;]); }
+    | Expr '&lt;/span&gt;[&lt;span class=&quot;string&quot;&gt;' Expr '&lt;/span&gt;]&lt;span class=&quot;string&quot;&gt;' { $$ = $1[$3]; }
+    | '&lt;/span&gt;{&lt;span class=&quot;string&quot;&gt;' '&lt;/span&gt;}&lt;span class=&quot;string&quot;&gt;' { $$ = {}; }
+    | new '&lt;/span&gt;RegExp&lt;span class=&quot;string&quot;&gt;' '&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;' string '&lt;/span&gt;)&lt;span class=&quot;string&quot;&gt;' Expr { $$ = Number(String($6).match(new RegExp($4))[0]); }
     ;
 
 Array
-    : &lt;span class=&quot;string&quot;&gt;'['&lt;/span&gt; ArrayList &lt;span class=&quot;string&quot;&gt;']'&lt;/span&gt; { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$2&lt;/span&gt;; }
+    : '&lt;/span&gt;[&lt;span class=&quot;string&quot;&gt;' ArrayList '&lt;/span&gt;]&lt;span class=&quot;string&quot;&gt;' { $$ = $2; }
     ;
 
 ArrayList
-    : { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = [] }
-    | Expr &lt;span class=&quot;string&quot;&gt;','&lt;/span&gt; ArrayList { &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;.&lt;span class=&quot;keyword&quot;&gt;unshift&lt;/span&gt;(&lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;); &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = &lt;span class=&quot;variable&quot;&gt;$3&lt;/span&gt;; }
-    | Expr { &lt;span class=&quot;variable&quot;&gt;$$&lt;/span&gt; = [&lt;span class=&quot;variable&quot;&gt;$1&lt;/span&gt;]; }
+    : { $$ = [] }
+    | Expr '&lt;/span&gt;,&lt;span class=&quot;string&quot;&gt;' ArrayList { $3.unshift($1); $$ = $3; }
+    | Expr { $$ = [$1]; }
     ;
 
 Number
-    : &lt;span class=&quot;keyword&quot;&gt;hex&lt;/span&gt;
-    | &lt;span class=&quot;keyword&quot;&gt;int&lt;/span&gt;
-    ;
+    : hex
+    | int
+    ;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
